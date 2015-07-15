@@ -25,24 +25,47 @@
         showPercentages: true,
         firstColHeader: 'Event'
       });
+      
+      var params = {
+        from: '2015-01-01',
+        to: '2015-01-01',
+        
+      }
 
       var runQuery = function() {
         var eventName = eventSelect.MPEventSelect('value'),
-            propName  = propSelect.MPPropertySelect('value'),
+            propName  = propSelect.MPPropertySelect('value')
             dateRange = dateSelect.MPDatepicker('value');
+        
+        params['from'] = dateRange.from.toISOString().substring(0, 10);
+        params['to'] = dateRange.to.toISOString().substring(0, 10);
 
         if (eventName) {
-          MP.api.segment(eventName, propName, dateRange).done(function(results) {
+          MP.api.segment(eventName, propName, params).done(function(results) {
             eventGraph.MPChart('setData', results);
             eventTable.MPTable('setData', results);
+            MP.api.people().done(function(data) {
+              console.log(data.values());
+              calculateResults(data.values()['total'], results.values());
+            });
           });
         }
+        
+        MP.api.people().done(function(results) {
+          console.log(results.values());
+        });
       };
+      
+      var calculateResults = function(people, results) {
+        console.log(results);
+      }
+      
       eventSelect.on('change', function(e, eventName) {
         propSelect.MPPropertySelect('setEvent', eventName);
         $("#by").show();
         runQuery();
       });
+      
       propSelect.on('change', runQuery);
       dateSelect.on('change', runQuery);
     </script>
