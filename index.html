@@ -16,6 +16,7 @@
       <div id="graph"></div>
     </div>
     <div id="table"></div>
+    <div id="results"></div>
     <script>
       var eventSelect = $('#eventSelect').MPEventSelect();
       var propSelect  = $('#propSelect').MPPropertySelect();
@@ -29,7 +30,8 @@
       var params = {
         from: '2015-01-01',
         to: '2015-01-01',
-        
+        type: 'general',
+        unit: 'day'
       }
 
       var runQuery = function() {
@@ -45,19 +47,25 @@
             eventGraph.MPChart('setData', results);
             eventTable.MPTable('setData', results);
             MP.api.people().done(function(data) {
-              console.log(data.values());
               calculateResults(data.values()['total'], results.values());
             });
           });
         }
-        
-        MP.api.people().done(function(results) {
-          console.log(results.values());
-        });
       };
       
       var calculateResults = function(people, results) {
         console.log(results);
+        console.log(people);
+        var total = 0;
+        var props = Object.keys(results);
+        for(i=0; i<props.length; i++) {
+          var dates = Object.keys(results[props[i]]);
+          for(j=0; j<dates.length; j++) {
+            total += results[props[i]][dates[j]];
+          }
+        }
+        var final = total / people * 100;
+        $('#results').append(toString(final) + "%");
       }
       
       eventSelect.on('change', function(e, eventName) {
