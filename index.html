@@ -43,6 +43,7 @@
         params['to'] = dateRange.to.toISOString().substring(0, 10);
 
         if (eventName) {
+          $('#results').empty();
           MP.api.segment(eventName, propName, params).done(function(results) {
             eventGraph.MPChart('setData', results);
             eventTable.MPTable('setData', results);
@@ -54,8 +55,6 @@
       };
       
       var calculateResults = function(people, results) {
-        console.log(results);
-        console.log(people);
         var total = 0;
         var props = Object.keys(results);
         for(i=0; i<props.length; i++) {
@@ -63,9 +62,9 @@
           for(j=0; j<dates.length; j++) {
             total += results[props[i]][dates[j]];
           }
+          var final = final = total / people * 100;
+          $('#results').append(props[i] + ": " + final + "% </br>");
         }
-        var final = total / people * 100;
-        $('#results').append(toString(final) + "%");
       }
       
       eventSelect.on('change', function(e, eventName) {
